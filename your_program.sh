@@ -1,15 +1,13 @@
-#!/bin/sh
-#
-# Use this script to run your program LOCALLY.
-#
-# Note: Changing this script WILL NOT affect how CodeCrafters runs your program.
-#
-# Learn more: https://codecrafters.io/program-interface
+#!/usr/bin/env python3
 
-set -e # Exit early if any commands fail
+import socket
 
-# Copied from .codecrafters/run.sh
-#
-# - Edit this to change how your program runs locally
-# - Edit .codecrafters/run.sh to change how your program runs remotely
-exec uv run --quiet -m app.main "$@"
+def main():
+    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
+    conn, addr = server_socket.accept()
+    conn.send("HTTP/1.1 200 OK\r\n\r\n".encode())
+
+
+if __name__ == "__main__":
+    main()
+
