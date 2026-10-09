@@ -38,8 +38,7 @@ def handle(conn):
     elif first_path == "echo" and sec_path != "":
         echo_body = sec_path.encode()
         accept_encoding = headers.get("accept-encoding", "")
-    
-    encodings = [e.strip() for e in accept_encoding.split(",")]
+        encodings = [e.strip() for e in accept_encoding.split(",")]
 
         if "gzip" in encodings:
             echo_body = gzip.compress(echo_body)
