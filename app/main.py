@@ -7,7 +7,7 @@ def handle(conn):
     text = data.decode()
 
     lines = text.split("\r\n")
-    request_line = line[0]
+    request_line = lines[0]
     parts = request_line.split()
     path = parts[1] if len(parts) > 1 else ""
     
