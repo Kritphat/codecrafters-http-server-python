@@ -10,8 +10,8 @@ def handle(conn):
     parts = request_line.split()
     path = parts[1] if len(parts) > 1 else ""
 
-    first_path = path.split("/")[0]
-    sec_path = path.split("/")[1]
+    first_path = path.split("/")[1]
+    sec_path = path.split("/")[2]
 
     if first_path == ("echo") and sec_path is str:
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
