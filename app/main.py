@@ -2,6 +2,8 @@ import socket
 import threading
 import os
 import sys
+import gzip
+
 
 directory = ""
 
@@ -40,7 +42,31 @@ def handle(conn):
             "\r\n"
             f"{sec_path}"
         )
+
+        if "gzip" in accept_encoding.split():
+            body = gzip.compress(body)
+
+            response = (
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: text/plain\r\n"
+                b"Content-Encoding: gzip\r\n"
+                + f"Content-Length: {len(body)}\r\n".encode()
+                + b"\r\n"
+                + body
+            )
+
+        else:
+            response = (
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: text/plain\r\n"
+                + f"Content-Length: {len(body)}\r\n".encode()
+                + b"\r\n"
+                + body
+            )
         conn.sendall(response.encode())
+    
+
+
 
     elif path == "/user-agent":
         user_agent = headers.get("user-agent", "")
