@@ -9,10 +9,13 @@ def handle(conn):
 
     data = conn.recv(1024)
     text = data.decode()
+    body = data.split(b"\r\n\r\n", 1)[1] if b"\r\n\r\n" in data else b""
 
     lines = text.split("\r\n")
     request_line = lines[0]
+
     parts = request_line.split()
+    method = parts[0] if len(parts) > 0 else ""
     path = parts[1] if len(parts) > 1 else ""
     
     headers = {}
@@ -27,9 +30,9 @@ def handle(conn):
     sec_path = part_path[2] if len(part_path) > 2 else ""
 
 
-    if path == "/":                                   
+    if path == "/":
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
-    elif first_path == "echo" and sec_path != "":   
+    elif first_path == "echo" and sec_path != "":
         response = (
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/plain\r\n"
@@ -39,7 +42,7 @@ def handle(conn):
         )
         conn.sendall(response.encode())
 
-    elif path == "/user-agent":                       
+    elif path == "/user-agent":
         user_agent = headers.get("user-agent", "")
         response = (
             "HTTP/1.1 200 OK\r\n"
@@ -50,10 +53,16 @@ def handle(conn):
         )
         conn.sendall(response.encode())
     
-    elif first_path == "files" and sec_path != "":  
+    elif first_path == "files" and sec_path != "":
         file_path = os.path.join(directory, sec_path)
-        if os.path.isfile(file_path):
-            with open(file_path, "rb") as f:          #read byte in file
+
+        if method == "POST":  
+            with open(file_path, "wb") as f:
+                f.write(body)
+            conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
+
+        elif os.path.isfile(file_path):
+            with open(file_path, "rb") as f:
                 content = f.read()
             header = (
                 "HTTP/1.1 200 OK\r\n"
@@ -64,6 +73,7 @@ def handle(conn):
             conn.sendall(header.encode() + content)
         else:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+
 
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
