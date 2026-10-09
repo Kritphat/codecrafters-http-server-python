@@ -90,7 +90,8 @@ def process_request(conn, data):
                 f"Content-Length: {len(content)}\r\n"
                 "\r\n"
             )
-            send(conn, header.encode() + content, close)
+        send(conn, header.encode() + content, close)
+        
         else:
             send(conn, b"HTTP/1.1 404 Not Found\r\n\r\n", close)
 
