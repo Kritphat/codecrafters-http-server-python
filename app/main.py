@@ -13,7 +13,7 @@ def handle(conn):
     first_path = path.split("/")[0]
     sec_path = path.split("/")[1]
 
-    if first_path == ("/echo") and sec_path is str:
+    if first_path == ("echo") and sec_path is str:
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
