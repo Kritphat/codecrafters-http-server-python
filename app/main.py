@@ -7,9 +7,7 @@ import gzip
 
 directory = ""
 
-def handle(conn):
-
-    data = conn.recv(1024)
+def process_request(conn, data):
     text = data.decode()
     body = data.split(b"\r\n\r\n", 1)[1] if b"\r\n\r\n" in data else b""
 
@@ -98,8 +96,13 @@ def handle(conn):
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
 
-    conn.close()
+def handle(conn):
+    data = conn.recv(1024)
+    if not data:
+        break
+    process_request(conn, data)
 
+    conn.close()
 
 
 def main():
