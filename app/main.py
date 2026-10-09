@@ -1,7 +1,7 @@
 import socket
 import threading
 import os
-
+import sys
 
 directory = ""
 
@@ -73,6 +73,11 @@ def handle(conn):
 
 
 def main():
+    global directory
+    if "--directory" in sys.argv:
+        directory = sys.argv[sys.argv.index("--directory") + 1]
+
+
     print("Logs from your program will appear here!")
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
