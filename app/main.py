@@ -24,6 +24,8 @@ def process_request(conn, data):
             break
         name, value = line.split(":", 1)              # split only at the first ":"
         headers[name.strip().lower()] = value.strip()
+
+    close = headers.get("connection", "").lower() == "close"
     
     part_path = path.split("/")
     first_path = part_path[1] if len(part_path) > 1 else ""
@@ -31,8 +33,8 @@ def process_request(conn, data):
 
 
     if path == "/":
-        conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
-    
+        send(conn, b"HTTP/1.1 200 OK\r\n\r\n", close)
+
     elif first_path == "echo" and sec_path != "":
         echo_body = sec_path.encode()
         accept_encoding = headers.get("accept-encoding", "")
@@ -56,7 +58,7 @@ def process_request(conn, data):
                 + b"\r\n"
                 + echo_body
             )
-        conn.sendall(response)   
+        send(conn, response, close)   
 
 
 
@@ -69,15 +71,15 @@ def process_request(conn, data):
             "\r\n"
             f"{user_agent}"
         )
-        conn.sendall(response.encode())
-    
+       send(conn, response.encode(), close)
+
     elif first_path == "files" and sec_path != "":
         file_path = os.path.join(directory, sec_path)
 
         if method == "POST":  
             with open(file_path, "wb") as f:
                 f.write(body)
-            conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
+            send(conn, b"HTTP/1.1 201 Created\r\n\r\n", close)
 
         elif os.path.isfile(file_path):
             with open(file_path, "rb") as f:
@@ -88,22 +90,36 @@ def process_request(conn, data):
                 f"Content-Length: {len(content)}\r\n"
                 "\r\n"
             )
-            conn.sendall(header.encode() + content)
+            send(conn, header.encode() + content, close)
         else:
-            conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+            send(conn, b"HTTP/1.1 404 Not Found\r\n\r\n", close)
 
 
     else:
-        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+        send(conn, b"HTTP/1.1 404 Not Found\r\n\r\n", close)
 
 def handle(conn):
     while True:
         data = conn.recv(1024)
         if not data:
             break
-        process_request(conn, data)
+
+        close = process_request(conn, data)
+
+        if close:
+            break
 
     conn.close()
+
+
+def send(conn, response, close):
+    if close:
+        # insert the header right after the status line
+        status_line, rest = response.split(b"\r\n", 1)
+        response = status_line + b"\r\nConnection: close\r\n" + rest
+    conn.sendall(response)
+
+
 
 
 def main():
