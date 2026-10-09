@@ -13,7 +13,7 @@ def handle(conn):
     
     part_path = path.split("/")
     first_path = part_path[1]
-    sec_path = part_path[2] if len(path_parts) > 2 else ""
+    sec_path = part_path[2] if len(part_path) > 2 else ""
 
 
     if path == "/":                                   
