@@ -34,37 +34,32 @@ def handle(conn):
 
     if path == "/":
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+    
     elif first_path == "echo" and sec_path != "":
-        response = (
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/plain\r\n"
-            f"Content-Length: {len(sec_path.encode())}\r\n"
-            "\r\n"
-            f"{sec_path}"
-        )
+        echo_body = sec_path.encode()
+        accept_encoding = headers.get("accept-encoding", "")
+    
+    encodings = [e.strip() for e in accept_encoding.split(",")]
 
-        if "gzip" in accept_encoding.split():
-            body = gzip.compress(body)
-
+        if "gzip" in encodings:
+            echo_body = gzip.compress(echo_body)
             response = (
                 b"HTTP/1.1 200 OK\r\n"
                 b"Content-Type: text/plain\r\n"
                 b"Content-Encoding: gzip\r\n"
-                + f"Content-Length: {len(body)}\r\n".encode()
+                + f"Content-Length: {len(echo_body)}\r\n".encode()
                 + b"\r\n"
-                + body
+                + echo_body
             )
-
         else:
             response = (
                 b"HTTP/1.1 200 OK\r\n"
                 b"Content-Type: text/plain\r\n"
-                + f"Content-Length: {len(body)}\r\n".encode()
+                + f"Content-Length: {len(echo_body)}\r\n".encode()
                 + b"\r\n"
-                + body
+                + echo_body
             )
-        conn.sendall(response.encode())
-    
+        conn.sendall(response)   
 
 
 
