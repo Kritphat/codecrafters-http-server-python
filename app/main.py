@@ -98,6 +98,9 @@ def process_request(conn, data):
     else:
         send(conn, b"HTTP/1.1 404 Not Found\r\n\r\n", close)
 
+
+    return close
+
 def handle(conn):
     while True:
         data = conn.recv(1024)
