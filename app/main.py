@@ -45,6 +45,21 @@ def handle(conn):
             f"{user_agent}"
         )
         conn.sendall(response.encode())
+    
+    elif first_path == "files" and sec_path != "":  
+        file_path = os.path.join(directory, sec_path)
+        if os.path.isfile(file_path):
+            with open(file_path, "rb") as f:          #read byte in file
+                content = f.read()
+            header = (
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: application/octet-stream\r\n"
+                f"Content-Length: {len(content)}\r\n"
+                "\r\n"
+            )
+            conn.sendall(header.encode() + content)
+        else:
+            conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
 
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
