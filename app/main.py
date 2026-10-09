@@ -72,7 +72,6 @@ def process_request(conn, data):
             f"{user_agent}"
         )
        send(conn, response.encode(), close)
-
     elif first_path == "files" and sec_path != "":
         file_path = os.path.join(directory, sec_path)
 
@@ -91,7 +90,6 @@ def process_request(conn, data):
                 "\r\n"
             )
             send(conn, header.encode() + content, close)
-        
         else:
             send(conn, b"HTTP/1.1 404 Not Found\r\n\r\n", close)
 
