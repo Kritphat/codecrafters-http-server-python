@@ -56,8 +56,10 @@ def handle(conn):
 def main():
     print("Logs from your program will appear here!")
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    conn, addr = server_socket.accept()
-    handle(conn)
+    while True:
+        conn, addr = server_socket.accept()
+        worker = threading.Thread(target=handle_client, args=(conn,))
+        worker.start()
 
 
 if __name__ == "__main__":
