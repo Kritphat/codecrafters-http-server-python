@@ -69,7 +69,7 @@ def process_request(conn, data):
             "\r\n"
             f"{user_agent}"
         )
-       send(conn, response.encode(), close)
+        send(conn, response.encode(), close)
 
     elif first_path == "files" and sec_path != "":
         file_path = os.path.join(directory, sec_path)
