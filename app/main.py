@@ -3,6 +3,8 @@ import threading
 import os
 
 
+directory = ""
+
 def handle(conn):
 
     data = conn.recv(1024)
