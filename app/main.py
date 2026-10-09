@@ -58,9 +58,7 @@ def process_request(conn, data):
                 + b"\r\n"
                 + echo_body
             )
-        send(conn, response, close)   
-
-
+        send(conn, response, close)
 
     elif path == "/user-agent":
         user_agent = headers.get("user-agent", "")
@@ -72,6 +70,7 @@ def process_request(conn, data):
             f"{user_agent}"
         )
        send(conn, response.encode(), close)
+
     elif first_path == "files" and sec_path != "":
         file_path = os.path.join(directory, sec_path)
 
@@ -79,7 +78,6 @@ def process_request(conn, data):
             with open(file_path, "wb") as f:
                 f.write(body)
             send(conn, b"HTTP/1.1 201 Created\r\n\r\n", close)
-
         elif os.path.isfile(file_path):
             with open(file_path, "rb") as f:
                 content = f.read()
